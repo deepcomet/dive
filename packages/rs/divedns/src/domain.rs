@@ -5,13 +5,14 @@ use idna::{
   uts46::{Hyphens, Uts46},
   AsciiDenyList,
 };
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::{error::DomainValidationError, util::Range, DiveResult};
 
 /// Domain struct. Should never be instantiated directly; use [`Domain::new`] for default
 /// validation or [`DomainValidator`] for custom options.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, JsonSchema)]
 pub struct Domain(String);
 
 impl Domain {
@@ -44,7 +45,7 @@ impl Display for Domain {
 }
 
 /// Configurable domain validator.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, JsonSchema)]
 pub struct DomainValidator {
   /// Required root domain.
   pub expect_root: Option<String>,
