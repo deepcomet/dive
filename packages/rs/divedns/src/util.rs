@@ -1,9 +1,10 @@
 use std::{fmt::Display, str::FromStr};
 
 use miette::IntoDiagnostic;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, JsonSchema)]
 pub enum Bound<T: Ord> {
   Include(T),
   Exclude(T),
@@ -18,7 +19,7 @@ impl<T: Ord+Display> Display for Bound<T> {
   }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, JsonSchema)]
 pub struct Range<T: Ord=usize> {
   pub start: Bound<T>,
   pub end: Bound<T>,

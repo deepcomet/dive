@@ -1,6 +1,6 @@
 [package]
 name = "divedns"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Deepcomet <hello@deepcomet.io>"]
 edition = "2021"
 homepage = "https://dive.domains"
@@ -21,5 +21,6 @@ bin = ["clap", "miette/fancy"]
 clap = { version = "4.5.16", optional = true, features = ["derive"] }
 idna = "1.0.2"
 miette = "7.2.0"
+schemars = "0.8.21"
 serde = { version = "1.0.208", features = ["derive"] }
 thiserror = "1.0.63"
