@@ -1,0 +1,24 @@
+[package]
+name = "divedns"
+version = "0.0.1"
+authors = ["Deepcomet <hello@deepcomet.io>"]
+edition = "2021"
+homepage = "https://dive.domains"
+repository = "https://github.com/deepcomet/dive"
+description = "Dive Domain Name System"
+
+[lib]
+
+[[bin]]
+name = "divedns"
+
+[features]
+default = ["bin"]
+bin = ["clap", "miette/fancy"]
+
+[dependencies]
+clap = { version = "4.5.16", optional = true, features = ["derive"] }
+idna = "1.0.2"
+miette = "7.2.0"
+serde = { version = "1.0.208", features = ["derive"] }
+thiserror = "1.0.63"

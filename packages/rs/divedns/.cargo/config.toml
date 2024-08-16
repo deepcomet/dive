@@ -1,0 +1,7 @@
+[alias]
+bin = "build --bin divedns"
+lib = "build --no-default-features --lib"
+rlsbin = "bin --release"
+rlslib = "lib --release"
+start = "run --bin divedns"
+bloat = "bloat --bin divedns --release"
