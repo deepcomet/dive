@@ -4,6 +4,7 @@ version = "0.0.1"
 authors = ["Deepcomet <hello@deepcomet.io>"]
 edition = "2021"
 homepage = "https://dive.domains"
+license = "Unlicense"
 repository = "https://github.com/deepcomet/dive"
 description = "Dive Domain Name System"
 
