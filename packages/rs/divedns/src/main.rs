@@ -1,4 +1,7 @@
+use std::str::FromStr;
+
 use clap::{Parser, Subcommand};
+use divedns::util::Range;
 use divedns::DomainValidator;
 use miette::Result;
 
@@ -27,11 +30,14 @@ enum CliDomainCommand {
     /// Domain name
     domain: String,
     /// Expected domain root
-    #[arg(long, visible_alias = "root")]
-    expect_root: Option<String>,
+    #[arg(long)]
+    root: Option<String>,
     /// Expected domain levels range (e.g. "1..3" (default inclusive), "(1..3]", etc)
-    #[arg(long, visible_alias = "levels")]
-    expect_levels: Option<String>,
+    #[arg(long)]
+    levels: Option<String>,
+    /// Expected domain length range
+    #[arg(long)]
+    length: Option<String>,
   },
   /// View domain information
   #[command(alias = "i")]
@@ -45,12 +51,12 @@ pub fn main() -> Result<()> {
   let cli = Cli::parse();
   match cli.command {
     CliCommand::Domain { command } => match command {
-      CliDomainCommand::Validate { domain, expect_root, expect_levels } => {
-        let validator = if expect_root.is_none() && expect_levels.is_none() {
-          DomainValidator::default()
-        } else {
-          DomainValidator::new(expect_root, expect_levels.map(|range| range.parse()).transpose()?)
-        };
+      CliDomainCommand::Validate { domain, root, levels, length } => {
+        let validator = DomainValidator::new(
+          root,
+          levels.map(|lvl| Range::from_str(lvl.as_str())).transpose()?,
+          length.map(|len| Range::from_str(len.as_str())).transpose()?,
+        );
         let domain = validator.validate(&domain)?;
         println!("{}", domain);
       }

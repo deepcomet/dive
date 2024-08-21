@@ -19,8 +19,8 @@ bin = ["clap", "miette/fancy"]
 
 [dependencies]
 clap = { version = "4.5.16", optional = true, features = ["derive"] }
+derive_more = { version = "1.0.0", features = ["error", "display", "from"] }
 idna = "1.0.2"
 miette = "7.2.0"
 schemars = "0.8.21"
 serde = { version = "1.0.208", features = ["derive"] }
-thiserror = "1.0.63"
