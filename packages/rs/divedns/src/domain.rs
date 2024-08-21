@@ -8,7 +8,7 @@ use idna::{
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::{error::DomainValidationError, util::Range, DiveResult};
+use crate::{error::DomainValidationError, util::Range, DiveError, DiveResult};
 
 /// Domain struct. Should never be instantiated directly; use [`Domain::new`] for default
 /// validation or [`DomainValidator`] for custom options.
@@ -48,55 +48,58 @@ impl Display for Domain {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, JsonSchema)]
 pub struct DomainValidator {
   /// Required root domain.
-  pub expect_root: Option<String>,
+  pub root: Option<String>,
   /// Required range of levels/subdomains. Counts base but not root (e.g. "hello.dive" has 1).
-  pub expect_levels: Option<Range>,
+  pub levels: Option<Range>,
+  /// Range of allowed total domain length.
+  pub length: Option<Range>,
 }
 
 impl DomainValidator {
   /// Create a domain validator.
-  pub const fn new(expect_root: Option<String>, expect_levels: Option<Range>) -> Self {
-    Self { expect_root, expect_levels }
+  pub const fn new(root: Option<String>, levels: Option<Range>, length: Option<Range>) -> Self {
+    Self { root, levels, length }
   }
 
   /// Validate a domain name.
   pub fn validate(&self, maybe_domain: &str) -> DiveResult<Domain> {
     let normalized = parse_domain_unicode(maybe_domain)?;
     let parts = normalized.split('.').collect::<Vec<&str>>();
-    if let Some(expect_root) = self.expect_root.as_ref() {
-      let actual_root = parts.last().ok_or(DomainValidationError::SegmentsNotValid {})?;
-      if actual_root != expect_root {
-        return Err(
-          DomainValidationError::RootMismatch {
-            expect: expect_root.to_string(),
-            actual: actual_root.to_string(),
-          }
-          .into(),
-        );
+    if let Some(expected_root) = self.root.as_ref() {
+      let actual_root = *parts.last().ok_or_else(|| DomainValidationError::SegmentsNotValid {})?;
+      if actual_root != expected_root {
+        return Err(DiveError::domain_root_mismatch(expected_root, actual_root));
       }
     }
-    if let Some(expect_levels) = self.expect_levels.as_ref() {
+    if let Some(expected_levels) = self.levels.as_ref() {
       let actual_level = parts.len();
-      if !expect_levels.includes(&actual_level) {
-        return Err(
-          DomainValidationError::LevelsOutOfRange {
-            expect: expect_levels.to_string(),
-            actual: actual_level.to_string(),
-          }
-          .into(),
-        );
+      if !expected_levels.includes(&actual_level) {
+        return Err(DiveError::domain_levels_out_of_range(
+          expected_levels.to_owned(),
+          actual_level,
+        ));
       }
     }
+    if let Some(expected_length) = self.length.as_ref() {
+      let actual_length = normalized.len();
+      if !expected_length.includes(&actual_length) {
+        return Err(DiveError::domain_length_out_of_range(
+          expected_length.to_owned(),
+          actual_length,
+        ));
+      }
+    };
     Ok(Domain(normalized))
   }
 }
 
 impl Default for DomainValidator {
   /// Defaukt validation settings:
-  /// - No expected root.
+  /// - Any root.
   /// - Any number of levels.
+  /// - Any length (that can parse as a valid domain name).
   fn default() -> Self {
-    Self { expect_root: None, expect_levels: None }
+    Self::new(None, None, None)
   }
 }
 
