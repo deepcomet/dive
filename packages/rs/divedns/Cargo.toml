@@ -1,6 +1,6 @@
 [package]
 name = "divedns"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["Deepcomet <hello@deepcomet.io>"]
 edition = "2021"
 homepage = "https://dive.domains"
